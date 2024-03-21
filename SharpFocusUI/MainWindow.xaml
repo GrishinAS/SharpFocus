@@ -1,0 +1,38 @@
+﻿<Window x:Class="SharpFocusUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SharpFocusUI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="400">
+    <Grid>
+        <!-- Main Content Area -->
+        <Grid>
+            <StackPanel Margin="10">
+                <!-- LeetCode Task Status -->
+                <TextBlock Text="LeetCode Task Status:" FontWeight="Bold"/>
+                <TextBlock Name="TaskStatus" Margin="0,0,0,10"/>
+                
+                
+                <!-- Buttons -->
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Name="Start" Content="Start Focus" Click="StartFocus_Click" Margin="5" />
+                    <Button Name="Stop" Content="Stop Focus" Click="StopFocus_Click" Margin="5" Grid.Column="1" IsEnabled="False" />
+                    <Button Content="Blocking Mode Settings" Margin="5" Click="OpenBlockingModeSettings_Click" Grid.Row="1" />
+                    <Button Content="Restricted Programs Settings" Click="OpenRestrictedProgramsSettings_Click" Margin="5" Grid.Row="1" Grid.Column="1" />
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

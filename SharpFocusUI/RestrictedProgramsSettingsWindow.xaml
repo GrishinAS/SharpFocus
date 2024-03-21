@@ -1,0 +1,27 @@
+﻿<Window x:Class="SharpFocusUI.RestrictedProgramsSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:SharpFocusUI"
+        WindowStyle="ToolWindow"
+        mc:Ignorable="d"
+        Title="Restricted Programs Settings" Height="450" Width="800">
+    <Grid Margin="10">
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ListBox x:Name="ProgramsList" Grid.Row="0" Margin="10" />
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
+            <TextBox x:Name="NewItemTextBox" Width="200" Margin="0,0,10,0" />
+            <Button Content="Add" Width="75" Click="AddProgram_Click" />
+            <Button Content="Delete" Width="75" Click="RemoveProgram_Click" Margin="10,0,0,0"/>
+            <Button Content="Save" Width="75" Click="SaveRestrictedProgramsSettings_Click" Margin="10,0,10,0" />
+            <Button Content="Cancel" Width="75" Click="Cancel_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

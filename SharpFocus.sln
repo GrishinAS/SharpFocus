@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpFocusUI", "SharpFocusUI\SharpFocusUI.csproj", "{027B6022-5CEF-4FBA-9887-D5AECE0E0E34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpFocus.Tests", "SharpFocus.Tests\SharpFocus.Tests.csproj", "{929B6022-E697-43F0-8289-90BAB7D24448}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FocusProcess", "FocusProcess\FocusProcess.csproj", "{603FAD99-7C5F-4BFC-AC44-53C75A8D1D52}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{027B6022-5CEF-4FBA-9887-D5AECE0E0E34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{027B6022-5CEF-4FBA-9887-D5AECE0E0E34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{027B6022-5CEF-4FBA-9887-D5AECE0E0E34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{027B6022-5CEF-4FBA-9887-D5AECE0E0E34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{929B6022-E697-43F0-8289-90BAB7D24448}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{929B6022-E697-43F0-8289-90BAB7D24448}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{929B6022-E697-43F0-8289-90BAB7D24448}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{929B6022-E697-43F0-8289-90BAB7D24448}.Release|Any CPU.Build.0 = Release|Any CPU
+		{603FAD99-7C5F-4BFC-AC44-53C75A8D1D52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{603FAD99-7C5F-4BFC-AC44-53C75A8D1D52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{603FAD99-7C5F-4BFC-AC44-53C75A8D1D52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{603FAD99-7C5F-4BFC-AC44-53C75A8D1D52}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
