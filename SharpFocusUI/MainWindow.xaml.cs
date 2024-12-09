@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using FocusProcess;
 
 namespace SharpFocusUI
@@ -25,14 +25,14 @@ namespace SharpFocusUI
             InitializeComponent();
             AppSettings loadSettings = LoadSettings();
             LeetCodeUsername.Text = loadSettings.LeetCodeUsername;
-            _processMonitor = new ProcessMonitor(ShowMsg, new LeetcodeClient());
+            _processMonitor = new ProcessMonitor(ShowMsg, StopWork, new LeetcodeClient(), loadSettings);
         }
 
 
         private void StartFocus_Click(object sender, RoutedEventArgs e)
         {
             _focusProcessTokenSource = new CancellationTokenSource();
-            Task.Run(() => _processMonitor.Start(_focusProcessTokenSource), _focusProcessTokenSource.Token);
+            Task.Run(() => _processMonitor.Start(_focusProcessTokenSource.Token), _focusProcessTokenSource.Token);
             
             Start.IsEnabled = false;
             Stop.IsEnabled = true;
@@ -40,9 +40,23 @@ namespace SharpFocusUI
         
         private void StopFocus_Click(object sender, RoutedEventArgs e)
         {
-            _focusProcessTokenSource?.Cancel();
-            Stop.IsEnabled = false;
-            Start.IsEnabled = true;
+            StopWork();
+        }
+
+        private void StopWork()
+        {
+            if (Application.Current.Dispatcher.CheckAccess()) {
+                _focusProcessTokenSource?.Cancel();
+                Stop.IsEnabled = false;
+                Start.IsEnabled = true;
+            }
+            else {
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(()=> {
+                    _focusProcessTokenSource?.Cancel();
+                    Stop.IsEnabled = false;
+                    Start.IsEnabled = true;
+                }));
+            }
         }
 
         private void OpenBlockingModeSettings_Click(object sender, RoutedEventArgs e)
@@ -99,7 +113,7 @@ namespace SharpFocusUI
         
         private static void ShowMsg(string message)
         {
-            MessageBox.Show(null, message, MessageBoxButton.OK);
+            MessageBox.Show(message, null, MessageBoxButton.OK);
         }
 
 

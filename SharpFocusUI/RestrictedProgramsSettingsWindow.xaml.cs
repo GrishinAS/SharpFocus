@@ -46,6 +46,7 @@ public partial class RestrictedProgramsSettingsWindow : Window
     private void LoadItemsFromStorage()
     {
         AppSettings appSettings = MainWindow.LoadSettings();
+        if (appSettings.RestrictedPrograms == null) return;
         foreach (string item in appSettings.RestrictedPrograms)
         {
             ProgramsList.Items.Add(item);

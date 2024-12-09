@@ -2,7 +2,6 @@
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
-using Newtonsoft.Json;
 
 namespace FocusProcess;
 
@@ -12,7 +11,7 @@ public class LeetcodeClient
 
     public static void Main()
     {
-        var task = new LeetcodeClient().CheckLeetCodeTaskCompletionAsync("ghjdthrfafbkj");
+        var task = new LeetcodeClient().CheckLeetCodeTaskCompletionAsync("");
         Console.WriteLine(task.Result);
     }
 
@@ -45,13 +44,13 @@ public class LeetcodeClient
             }
         };
 
-        // Make the GraphQL request with the query, variables, and headers
-        GraphQLResponse<StreakCounterData> response = await client.SendQueryAsync(getStreakCounterRequest, () => new StreakCounterData());
+        GraphQLResponse<StreakCounterData> response =
+            await client.SendQueryAsync(getStreakCounterRequest, () => new StreakCounterData());
 
-        // Handle the response
-        Console.WriteLine(response.Errors != null
-            ? $"GraphQL request failed: {response.Errors.Select(e=>e.Message).Aggregate((a, b) => $"{a}, {b}")}"
-            : $"Response: {response.Data}");
+        if (response.Errors != null)
+           throw new Exception(
+                $"GraphQL request failed: {response.Errors.Select(e => e.Message).Aggregate((a, b) => $"{a}, {b}")}");
+
 
         UserCalendar? submissionsCalendar = response.Data.MatchedUser?.UserCalendar;
         return submissionsCalendar;
@@ -67,4 +66,3 @@ public class LeetcodeClient
 	            }
             }";
 }
-

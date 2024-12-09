@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Management;
+using SharpFocusUI;
 
 namespace FocusProcess;
 
@@ -8,41 +8,51 @@ public class ProcessMonitor
     private readonly List<string> _restrictedProcesses = new();
     private readonly string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "restrictedPrograms.txt");
     private readonly ShowMsgDelegate _showMessageDelegate;
+    private readonly StopWork _stopWork;
     private readonly LeetcodeClient _leetcodeClient;
+    private readonly AppSettings _loadSettings;
 
-    public ProcessMonitor(ShowMsgDelegate showMessageDelegate, LeetcodeClient leetcodeClient)
+    public ProcessMonitor(ShowMsgDelegate showMessageDelegate, StopWork stopWork, LeetcodeClient leetcodeClient, AppSettings loadSettings)
     {
         _showMessageDelegate = showMessageDelegate;
+        _stopWork = stopWork;
         _leetcodeClient = leetcodeClient;
+        _loadSettings = loadSettings;
     }
 
     public delegate void ShowMsgDelegate(string message);
+    public delegate void StopWork();
 
-    public void Start(CancellationTokenSource token)
+    public void Start(CancellationToken token)
     {
         try
         {
             LoadItemsFromStorage();
-            const string query = "SELECT * FROM __InstanceCreationEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_Process'";
-            using var watcher = new ManagementEventWatcher(query);
-            //StartListenForNewProcesses(watcher);
             while (!token.IsCancellationRequested)
             {
                 Process[] processes = Process.GetProcesses();
 
-                List<Process> restrictedProcessesRun = processes.Where(p => _restrictedProcesses.Contains(p.ProcessName)).ToList();
+                List<Process> restrictedProcessesRun = processes.Where(p => _restrictedProcesses
+                    .Contains(p.ProcessName))
+                    .DistinctBy(p => p.ProcessName).ToList();
             
                 foreach (Process process in restrictedProcessesRun)
                 {
                     Console.WriteLine($"Restricted process '{process.ProcessName}' detected.");
                     Console.WriteLine("Checking time.");
                     bool late = DateTime.Now.Hour > 16;
-                    Console.WriteLine("Checking leetcode status.");
-                    Task<bool> leetcodeSolved = _leetcodeClient.CheckLeetCodeTaskCompletionAsync("");
-
-                    if (late || leetcodeSolved.Result)
+                    if (late)
                     {
-                        token.Cancel();
+                        Console.WriteLine("It's late, access granted.");
+                        _stopWork.Invoke();
+                        return;
+                    }
+                    Console.WriteLine("Checking leetcode status.");
+                    Task<bool> leetcodeSolved = _leetcodeClient.CheckLeetCodeTaskCompletionAsync(_loadSettings.LeetCodeUsername);
+                    if (leetcodeSolved.Result)
+                    {
+                        Console.WriteLine("Leetcode task completed.");
+                        _stopWork.Invoke();
                         return;
                     }
 
@@ -55,40 +65,12 @@ public class ProcessMonitor
                 // Delay for a short interval before checking processes again
                 Thread.Sleep(8000); 
             }
-            watcher.Stop();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             throw;
         }
-    }
-    
-    private void StartListenForNewProcesses(ManagementEventWatcher watcher)
-    {
-        watcher.EventArrived += (sender, e) =>
-        {
-            var targetInstance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
-            string processName = targetInstance["Name"]?.ToString();
-            if (_restrictedProcesses.Any(app => app.Equals(processName?.Replace(".exe", ""), StringComparison.OrdinalIgnoreCase)))
-            {
-                try
-                {
-                    int processId = Convert.ToInt32(targetInstance["ProcessId"]);
-                    var process = Process.GetProcessById(processId);
-                    process.Kill();
-                    Console.WriteLine($"Blocked and terminated: {processName}");
-                    _showMessageDelegate?.Invoke($"Restricted process '{process.ProcessName}' was killed. Solve your daily Leetcode task to run it");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to block {processName}: {ex.Message}");
-                }
-            }
-        };
-
-        Console.WriteLine("Listening for new processes...");
-        watcher.Start();
     }
     
     private void LoadItemsFromStorage()
