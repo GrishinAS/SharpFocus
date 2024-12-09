@@ -15,34 +15,13 @@ public class LeetcodeClient
         var task = new LeetcodeClient().CheckLeetCodeTaskCompletionAsync("");
         Console.WriteLine(task.Result);
     }
-    
+
     public async Task<bool> CheckLeetCodeTaskCompletionAsync(string username)
     {
         try
         {
-            // Create a GraphQLHttpClient with the endpoint URL and configure headers
-            var client = new GraphQLHttpClient(LEETCODE_API, new NewtonsoftJsonSerializer());
-            //client.HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "YOUR_ACCESS_TOKEN");
-            //client.HttpClient.DefaultRequestHeaders.Add("x-csrftoken", "");
-            //client.HttpClient.DefaultRequestHeaders.Add("Cookie", "LEETCODE_SESSION=");
-            
-            var getStreakCounterRequest = new GraphQLRequest {
-                Query = DAILY_STAT_QUERY,
-                OperationName = "getStreakCounter",
-                Variables = new {
-                    username
-                }
-            };
-
-            // Make the GraphQL request with the query, variables, and headers
-            var response = await client.SendQueryAsync(getStreakCounterRequest, () => new StreakCounterResponse() );
-
-            // Handle the response
-            Console.WriteLine(response.Errors != null
-                ? $"GraphQL request failed: {response.Errors}"
-                : $"Response: {response.Data}");
-
-            return response.Data.Data.StreakCounter.CurrentDayCompleted;
+            UserCalendar? submissionsCalendar = await RetrieveSubmissionsCalendar(username);
+            return submissionsCalendar?.SubmissionCalendar.ContainsKey(DateTime.UtcNow.Date) ?? false;
         }
         catch (Exception ex)
         {
@@ -51,38 +30,41 @@ public class LeetcodeClient
         }
     }
 
-    private const string DAILY_STAT_QUERY = @"
-            query getStreakCounter {
-                streakCounter {
-                    currentDayCompleted
-                    }
+    private static async Task<UserCalendar?> RetrieveSubmissionsCalendar(string username)
+    {
+        var client = new GraphQLHttpClient(LEETCODE_API, new NewtonsoftJsonSerializer());
+
+        var getStreakCounterRequest = new GraphQLRequest
+        {
+            Query = SubmissionsCalendarQuery,
+            OperationName = "userProfileCalendar",
+            Variables = new
+            {
+                username,
+                year = DateTime.Now.Year.ToString()
+            }
+        };
+
+        // Make the GraphQL request with the query, variables, and headers
+        GraphQLResponse<StreakCounterData> response = await client.SendQueryAsync(getStreakCounterRequest, () => new StreakCounterData());
+
+        // Handle the response
+        Console.WriteLine(response.Errors != null
+            ? $"GraphQL request failed: {response.Errors.Select(e=>e.Message).Aggregate((a, b) => $"{a}, {b}")}"
+            : $"Response: {response.Data}");
+
+        UserCalendar? submissionsCalendar = response.Data.MatchedUser?.UserCalendar;
+        return submissionsCalendar;
+    }
+
+    private const string SubmissionsCalendarQuery = @"
+            query userProfileCalendar($username: String!, $year: Int) {  
+                matchedUser(username: $username) 
+	            {   userCalendar(year: $year) 
+	            	{      
+	            	submissionCalendar    
+	            	}  
+	            }
             }";
 }
 
-public class StreakCounterResponse
-{
-    [JsonProperty("data")]
-    public StreakCounterData Data { get; set; }
-
-    public override string ToString()
-    {
-        return $"{nameof(Data)}: {Data}";
-    }
-}
-
-public class StreakCounterData
-{
-    [JsonProperty("streakCounter")]
-    public StreakCounter StreakCounter { get; set; }
-}
-
-public class StreakCounter
-{
-    [JsonProperty("streakCount")] 
-    public bool CurrentDayCompleted { get; set; }
-
-    public override string ToString()
-    {
-        return $"{nameof(CurrentDayCompleted)}: {CurrentDayCompleted}";
-    }
-}
