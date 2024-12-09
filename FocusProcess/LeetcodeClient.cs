@@ -9,6 +9,12 @@ namespace FocusProcess;
 public class LeetcodeClient
 {
     private const string LEETCODE_API = "https://leetcode.com/graphql/";
+
+    public static void Main()
+    {
+        var task = new LeetcodeClient().CheckLeetCodeTaskCompletionAsync("");
+        Console.WriteLine(task.Result);
+    }
     
     public async Task<bool> CheckLeetCodeTaskCompletionAsync(string username)
     {
@@ -17,8 +23,8 @@ public class LeetcodeClient
             // Create a GraphQLHttpClient with the endpoint URL and configure headers
             var client = new GraphQLHttpClient(LEETCODE_API, new NewtonsoftJsonSerializer());
             //client.HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "YOUR_ACCESS_TOKEN");
-            client.HttpClient.DefaultRequestHeaders.Add("x-csrftoken", "IqpuESC6Pkuuji5j4FoqCEOiryMX3BIbnO1Sr2NQQpclH8plsptF91JYomLbMH0o;");
-            client.HttpClient.DefaultRequestHeaders.Add("Cookie", "LEETCODE_SESSION=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfYXV0aF91c2VyX2lkIjoiMzU0MDA0MSIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImFsbGF1dGguYWNjb3VudC5hdXRoX2JhY2tlbmRzLkF1dGhlbnRpY2F0aW9uQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6IjJkNzM3OWMxODAzNzRjZjcyNTYxMDBlOWU4MDZiZGE3OTJmM2I2ZTY3MDJjMDc0MTZlMjlhNmZlNzc2ODZlYzkiLCJpZCI6MzU0MDA0MSwiZW1haWwiOiJnaGpkdGhyZmFmYmtqQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiZ2hqZHRocmZhZmJraiIsInVzZXJfc2x1ZyI6ImdoamR0aHJmYWZia2oiLCJhdmF0YXIiOiJodHRwczovL2Fzc2V0cy5sZWV0Y29kZS5jb20vdXNlcnMvZ2hqZHRocmZhZmJrai9hdmF0YXJfMTYwNDEzNTc1Ny5wbmciLCJyZWZyZXNoZWRfYXQiOjE3MDg5Mjc5NzYsImlwIjoiNDcuMTQ2LjE2MC4xMDciLCJpZGVudGl0eSI6IjlmZWE3MDFhNjI3YTU3ZDBjNDU4ZGIyZTFjYjYwZDYyIiwic2Vzc2lvbl9pZCI6NTYwNjA1NjN9.C82Rcun64KdvB1GMnf7h60AS3mgEpDqw03Ol6RknFzI;");
+            //client.HttpClient.DefaultRequestHeaders.Add("x-csrftoken", "");
+            //client.HttpClient.DefaultRequestHeaders.Add("Cookie", "LEETCODE_SESSION=");
             
             var getStreakCounterRequest = new GraphQLRequest {
                 Query = DAILY_STAT_QUERY,
@@ -57,6 +63,11 @@ public class StreakCounterResponse
 {
     [JsonProperty("data")]
     public StreakCounterData Data { get; set; }
+
+    public override string ToString()
+    {
+        return $"{nameof(Data)}: {Data}";
+    }
 }
 
 public class StreakCounterData
@@ -69,4 +80,9 @@ public class StreakCounter
 {
     [JsonProperty("streakCount")] 
     public bool CurrentDayCompleted { get; set; }
+
+    public override string ToString()
+    {
+        return $"{nameof(CurrentDayCompleted)}: {CurrentDayCompleted}";
+    }
 }

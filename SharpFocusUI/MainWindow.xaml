@@ -28,8 +28,10 @@
                     </Grid.ColumnDefinitions>
 
                     <Button Name="Start" Content="Start Focus" Click="StartFocus_Click" Margin="5" />
-                    <Button Name="Stop" Content="Stop Focus" Click="StopFocus_Click" Margin="5" Grid.Column="1" IsEnabled="False" />
-                    <Button Content="Blocking Mode Settings" Margin="5" Click="OpenBlockingModeSettings_Click" Grid.Row="1" />
+                    <Button Name="Stop" Content="Stop Focus" Click="StopFocus_Click" Margin="5" Grid.Row="0"
+                            Grid.Column="1" IsEnabled="False" />
+                    <Button Content="Blocking Mode Settings" Margin="5" Click="OpenBlockingModeSettings_Click" Grid.Row="1"
+                            Grid.Column="0" />
                     <Button Content="Restricted Programs Settings" Click="OpenRestrictedProgramsSettings_Click" Margin="5" Grid.Row="1" Grid.Column="1" />
                 </Grid>
             </StackPanel>

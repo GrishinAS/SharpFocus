@@ -1,14 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net7.0-windows</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="GraphQL.Client" Version="6.0.2" />
       <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.0.2" />
+      <PackageReference Include="GraphQL.Primitives" Version="6.0.2" />
+      <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.6" />
+      <PackageReference Include="System.Management" Version="7.0.2" />
     </ItemGroup>
 
 </Project>

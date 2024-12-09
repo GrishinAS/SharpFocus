@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using FocusProcess;
 
@@ -12,8 +13,8 @@ namespace SharpFocusUI
     {
         private readonly ProcessMonitor _processMonitor;
         private CancellationTokenSource? _focusProcessTokenSource;
-        private RestrictedProgramsSettingsWindow? restrictedProgramsSettingsWindow;
-        private BlockingModeSettingsWindow? blockingModeSettingsWindow;
+        private RestrictedProgramsSettingsWindow? _restrictedProgramsSettingsWindow;
+        private BlockingModeSettingsWindow? _blockingModeSettingsWindow;
 
         public MainWindow()
         {
@@ -25,7 +26,8 @@ namespace SharpFocusUI
         private void StartFocus_Click(object sender, RoutedEventArgs e)
         {
             _focusProcessTokenSource = new CancellationTokenSource();
-            _processMonitor.Start(_focusProcessTokenSource.Token);
+            Task.Run(() => _processMonitor.Start(_focusProcessTokenSource), _focusProcessTokenSource.Token);
+            
             Start.IsEnabled = false;
             Stop.IsEnabled = true;
         }
@@ -36,62 +38,57 @@ namespace SharpFocusUI
             Stop.IsEnabled = false;
             Start.IsEnabled = true;
         }
-        
-        private void SkipProtection_Click(object sender, RoutedEventArgs e)
-        {
-            throw new System.NotImplementedException();
-        }
 
         private void OpenBlockingModeSettings_Click(object sender, RoutedEventArgs e)
         {
-            if (blockingModeSettingsWindow == null)
+            if (_blockingModeSettingsWindow == null)
             {
-                blockingModeSettingsWindow = new BlockingModeSettingsWindow();
-                blockingModeSettingsWindow.Closed += BlockingModeSettingsWindow_Closed;
-                blockingModeSettingsWindow.Show();
+                _blockingModeSettingsWindow = new BlockingModeSettingsWindow();
+                _blockingModeSettingsWindow.Closed += BlockingModeSettingsWindow_Closed;
+                _blockingModeSettingsWindow.Show();
             }
             else
             {
-                if (blockingModeSettingsWindow.Visibility == Visibility.Hidden)
+                if (_blockingModeSettingsWindow.Visibility == Visibility.Hidden)
                 {
-                    blockingModeSettingsWindow.Visibility = Visibility.Visible;
+                    _blockingModeSettingsWindow.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    blockingModeSettingsWindow.Focus();
+                    _blockingModeSettingsWindow.Focus();
                 }
             }
         }
 
         private void OpenRestrictedProgramsSettings_Click(object sender, RoutedEventArgs e)
         {
-            if (restrictedProgramsSettingsWindow == null)
+            if (_restrictedProgramsSettingsWindow == null)
             {
-                restrictedProgramsSettingsWindow = new RestrictedProgramsSettingsWindow();
-                restrictedProgramsSettingsWindow.Closed += RestrictedProgramsSettingsWindow_Closed;
-                restrictedProgramsSettingsWindow.Show();
+                _restrictedProgramsSettingsWindow = new RestrictedProgramsSettingsWindow();
+                _restrictedProgramsSettingsWindow.Closed += RestrictedProgramsSettingsWindow_Closed;
+                _restrictedProgramsSettingsWindow.Show();
             }
             else
             {
-                if (restrictedProgramsSettingsWindow.Visibility == Visibility.Hidden)
+                if (_restrictedProgramsSettingsWindow.Visibility == Visibility.Hidden)
                 {
-                    restrictedProgramsSettingsWindow.Visibility = Visibility.Visible;
+                    _restrictedProgramsSettingsWindow.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    restrictedProgramsSettingsWindow.Focus();
+                    _restrictedProgramsSettingsWindow.Focus();
                 }
             }
         }
         
         private void RestrictedProgramsSettingsWindow_Closed(object? sender, EventArgs e)
         {
-            restrictedProgramsSettingsWindow = null;
+            _restrictedProgramsSettingsWindow = null;
         }
         
         private void BlockingModeSettingsWindow_Closed(object? sender, EventArgs e)
         {
-            blockingModeSettingsWindow = null;
+            _blockingModeSettingsWindow = null;
         }
         
         private static void ShowProcessKilledMsg(string processName)
