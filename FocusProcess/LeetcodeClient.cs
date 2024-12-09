@@ -12,7 +12,7 @@ public class LeetcodeClient
 
     public static void Main()
     {
-        var task = new LeetcodeClient().CheckLeetCodeTaskCompletionAsync("");
+        var task = new LeetcodeClient().CheckLeetCodeTaskCompletionAsync("ghjdthrfafbkj");
         Console.WriteLine(task.Result);
     }
 

@@ -5,30 +5,32 @@ namespace FocusProcess;
 
 public class ProcessMonitor
 {
-    private string[] restrictedProcesses = { "notepad", "calc" };
-    private readonly ProcessKillDelegate _processKillDelegate;
+    private readonly List<string> _restrictedProcesses = new();
+    private readonly string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "restrictedPrograms.txt");
+    private readonly ShowMsgDelegate _showMessageDelegate;
     private readonly LeetcodeClient _leetcodeClient;
 
-    public ProcessMonitor(ProcessKillDelegate processKillDelegate, LeetcodeClient leetcodeClient)
+    public ProcessMonitor(ShowMsgDelegate showMessageDelegate, LeetcodeClient leetcodeClient)
     {
-        _processKillDelegate = processKillDelegate;
+        _showMessageDelegate = showMessageDelegate;
         _leetcodeClient = leetcodeClient;
     }
 
-    public delegate void ProcessKillDelegate(string processName);
+    public delegate void ShowMsgDelegate(string message);
 
     public void Start(CancellationTokenSource token)
     {
         try
         {
+            LoadItemsFromStorage();
             const string query = "SELECT * FROM __InstanceCreationEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_Process'";
             using var watcher = new ManagementEventWatcher(query);
-            StartListenForNewProcesses(watcher);
+            //StartListenForNewProcesses(watcher);
             while (!token.IsCancellationRequested)
             {
                 Process[] processes = Process.GetProcesses();
 
-                List<Process> restrictedProcessesRun = processes.Where(p => restrictedProcesses.Contains(p.ProcessName)).ToList();
+                List<Process> restrictedProcessesRun = processes.Where(p => _restrictedProcesses.Contains(p.ProcessName)).ToList();
             
                 foreach (Process process in restrictedProcessesRun)
                 {
@@ -46,12 +48,12 @@ public class ProcessMonitor
 
                     process.Kill();
                 
-                    _processKillDelegate?.Invoke(process.ProcessName);
+                    _showMessageDelegate?.Invoke($"Restricted process '{process.ProcessName}' was killed. Solve your daily Leetcode task to run it");
                 }
             
 
                 // Delay for a short interval before checking processes again
-                Thread.Sleep(5000); 
+                Thread.Sleep(8000); 
             }
             watcher.Stop();
         }
@@ -68,7 +70,7 @@ public class ProcessMonitor
         {
             var targetInstance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
             string processName = targetInstance["Name"]?.ToString();
-            if (restrictedProcesses.Any(app => app.Equals(processName?.Replace(".exe", ""), StringComparison.OrdinalIgnoreCase)))
+            if (_restrictedProcesses.Any(app => app.Equals(processName?.Replace(".exe", ""), StringComparison.OrdinalIgnoreCase)))
             {
                 try
                 {
@@ -76,7 +78,7 @@ public class ProcessMonitor
                     var process = Process.GetProcessById(processId);
                     process.Kill();
                     Console.WriteLine($"Blocked and terminated: {processName}");
-                    _processKillDelegate?.Invoke(process.ProcessName);
+                    _showMessageDelegate?.Invoke($"Restricted process '{process.ProcessName}' was killed. Solve your daily Leetcode task to run it");
                 }
                 catch (Exception ex)
                 {
@@ -87,5 +89,21 @@ public class ProcessMonitor
 
         Console.WriteLine("Listening for new processes...");
         watcher.Start();
+    }
+    
+    private void LoadItemsFromStorage()
+    {
+        if (File.Exists(_filePath))
+        {
+            List<string> items = File.ReadAllLines(_filePath).ToList();
+            foreach (string item in items)
+            {
+                _restrictedProcesses.Add(item);
+            }
+        }
+        else
+        {
+            _showMessageDelegate?.Invoke("No processes to track configured. Add some processes.");
+        }
     }
 }

@@ -34,7 +34,14 @@
                             Grid.Column="0" />
                     <Button Content="Restricted Programs Settings" Click="OpenRestrictedProgramsSettings_Click" Margin="5" Grid.Row="1" Grid.Column="1" />
                 </Grid>
+                
+                <StackPanel Margin="10,20,10,0" HorizontalAlignment="Center">
+                    <TextBlock Text="Leetcode username:" FontWeight="Bold" Margin="0,0,0,5" />
+                    <TextBox Name="LeetCodeUsername" Width="200" Margin="0,0,0,10" />
+                    <Button Content="Save" Width="80" HorizontalAlignment="Center" Click="SaveUsername_Click" />
+                </StackPanel>
             </StackPanel>
+            
         </Grid>
     </Grid>
 </Window>

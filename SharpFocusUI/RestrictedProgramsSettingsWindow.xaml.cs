@@ -1,14 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace SharpFocusUI;
 
 public partial class RestrictedProgramsSettingsWindow : Window
 {
-    private readonly string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "restrictedPrograms.txt");
 
     public RestrictedProgramsSettingsWindow()
     {
@@ -38,18 +36,19 @@ public partial class RestrictedProgramsSettingsWindow : Window
     
     private void SaveItemsToStorage()
     {
-        File.WriteAllLines(_filePath, ProgramsList.Items.Cast<string>());
+        AppSettings appSettings = MainWindow.LoadSettings();
+        appSettings.RestrictedPrograms = ProgramsList.Items.Cast<string>().ToList();
+        
+        string json = JsonSerializer.Serialize(appSettings, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText(MainWindow.SettingsFilePath, json);
     }
     
     private void LoadItemsFromStorage()
     {
-        if (File.Exists(_filePath))
+        AppSettings appSettings = MainWindow.LoadSettings();
+        foreach (string item in appSettings.RestrictedPrograms)
         {
-            var items = File.ReadAllLines(_filePath).ToList();
-            foreach (string item in items)
-            {
-                ProgramsList.Items.Add(item);
-            }
+            ProgramsList.Items.Add(item);
         }
     }
 

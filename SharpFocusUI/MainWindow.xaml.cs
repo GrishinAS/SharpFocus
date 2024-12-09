@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,11 +18,14 @@ namespace SharpFocusUI
         private CancellationTokenSource? _focusProcessTokenSource;
         private RestrictedProgramsSettingsWindow? _restrictedProgramsSettingsWindow;
         private BlockingModeSettingsWindow? _blockingModeSettingsWindow;
+        public static readonly string SettingsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "focus_settings.cfg");
 
         public MainWindow()
         {
             InitializeComponent();
-            _processMonitor = new ProcessMonitor(ShowProcessKilledMsg, new LeetcodeClient());
+            AppSettings loadSettings = LoadSettings();
+            LeetCodeUsername.Text = loadSettings.LeetCodeUsername;
+            _processMonitor = new ProcessMonitor(ShowMsg, new LeetcodeClient());
         }
 
 
@@ -91,11 +97,28 @@ namespace SharpFocusUI
             _blockingModeSettingsWindow = null;
         }
         
-        private static void ShowProcessKilledMsg(string processName)
+        private static void ShowMsg(string message)
         {
-            MessageBox.Show(null, $"Restricted process '{processName}' was killed. Solve your daily Leetcode task to run it", MessageBoxButton.OK);
+            MessageBox.Show(null, message, MessageBoxButton.OK);
         }
 
 
+        private void SaveUsername_Click(object sender, RoutedEventArgs e)
+        {
+            AppSettings appSettings = LoadSettings();
+            appSettings.LeetCodeUsername = LeetCodeUsername.Text;
+            string json = JsonSerializer.Serialize(appSettings, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(SettingsFilePath, json);
+        }
+        
+        public static AppSettings LoadSettings()
+        {
+            if (File.Exists(SettingsFilePath))
+            {
+                string json = File.ReadAllText(SettingsFilePath);
+                return JsonSerializer.Deserialize<AppSettings>(json) ?? throw new InvalidOperationException("Failed to load settings");
+            }
+            return new AppSettings();
+        }
     }
 }
