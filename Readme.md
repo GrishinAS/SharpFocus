@@ -1,12 +1,27 @@
-Tool for keeping yourself focused on solving Leetcode tasks instead of wasting time on videogames.
+# Focus Assistant for Leetcode
 
-This tool doesn't allow you to run specific apps until you solve your daily task or at least one task of Medium difficulty.
+A productivity tool designed to keep you focused on solving Leetcode tasks by limiting access to distractions like video games or social networks.
 
-Make adjustable list of programs that are restricted to run
-Or make a complete blocking mode that blocks everything except browser with Leetcode website.
+This tool enforces restrictions until you complete your daily task at Leetcode.
 
-Make a notification 1hr/15min/5min/1min until blocking.
+---
 
-Parent control with a password protection to change/skip the protection this time.
+## Features
 
-Run process of checking for the restricted programs constantly. On detection check time and leetcode status
+### **Program Restrictions**
+- **Adjustable App Blocklist**: Customize the list of applications that are restricted from running.
+
+
+### **Real-Time Monitoring**
+- Continuously monitor system processes for restricted programs.
+- Validate access permissions based on Leetcode task completion status and current time.
+
+### **Complete Blocking Mode** *(Planned)*: 
+- Restrict access to all programs except a browser with the Leetcode website open.
+- Receive timed notifications before restrictions are applied or lifted:
+- Protect settings with a password to:
+    - Prevent impulsive or unauthorized disabling.
+    - Temporarily bypass restrictions with approval.
+
+### **Autostart feature** *(Planned)*:
+- Create a service that starts with the system and tracks your open apps in background.
